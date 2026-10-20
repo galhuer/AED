@@ -1,0 +1,275 @@
+---
+title: "Comparación de mammals y Animals2"
+author: "Carlos Galdámez Huertas (galhuer)"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    echo: true
+    number_sections: true
+    theme: lumen
+    toc: true
+  bookdown::pdf_document2:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+    figure_caption: "Figura" # Referencias en castellano
+    table_caption: "Tabla"
+  html_notebook:
+    echo: true
+    number_sections: true
+    toc: true
+  pdf_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+  bookdown::html_document2:
+    echo: true
+    number_sections: true
+    theme: spacelab
+    toc: true
+    figure_caption: "Figura"
+    table_caption: "Tabla"
+always_allow_html: true
+params:
+  lang: ES
+lang: "`r switch(params$lang, ES = 'es-ES', EN = 'en-US')`"
+subtitle: "Análisis Exploratorio de Datos. Máster en Ciencia de Datos - UV"
+language:
+  label:
+    fig: 'Figura '
+    tab: 'Tabla '
+    eq: 'Ecuación '
+    thm: 'Teorema '
+    lem: 'Lema '
+    def: 'Definición '
+    cor: 'Corolario '
+    prp: 'Proposición '
+    exm: 'Ejemplo '
+    exr: 'Ejercicio '
+    proof: 'Demostración. '
+    remark: 'Nota: '
+    solution: 'Solución. '
+---
+
+```{r setup, cache = F, echo = F, message = F, warning = F, tidy = F}
+
+
+# CONFIGURACIÓN GENERAL
+library(knitr)
+options(width = 100)
+
+# Opciones generales de los chucks. Se utilizarán salvo cambios en el chunk
+opts_chunk$set(echo=F, message = F, error = F, warning = F, comment = NA, fig.align = 'center', dpi = 200, tidy = F, cache.path = '.cache/', fig.path = './figura/')
+
+# Opciones generales de dígitos cuando se incluyen tablas
+#options(xtable.type = 'html')
+knit_hooks$set(inline = function(x) {
+
+  if(is.numeric(x)) {
+    round(x, getOption('digits'))
+  } else {
+    paste(as.character(x), collapse = ', ')
+  }
+})
+#knit_hooks$set(plot = knitr:::hook_plot_html)
+```
+
+# Introducción
+
+Resolución del ejercicio de control de versiones de Análisis Exploratorio
+de Datos. Se comparan `MASS::mammals` y `robustbase::Animals2` usando R base.
+El enunciado original se conserva en `EjercicioControlVersiones_AED.html`.
+
+**Alumno:** Carlos Galdámez Huertas. **Usuario UV y GitHub:** galhuer.
+
+```{r cargar-datos, echo=TRUE}
+library(MASS)
+library(robustbase)
+data("mammals", package = "MASS")
+data("Animals2", package = "robustbase")
+```
+
+# 1. Características de los conjuntos de datos
+
+Las consultas de ayuda utilizadas son:
+
+```{r consultar-ayuda, echo=TRUE, eval=FALSE}
+help("mammals", package = "MASS")
+help("Animals2", package = "robustbase")
+```
+
+Según la [ayuda de mammals](https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/mammals.html),
+este conjunto contiene los pesos medios del cuerpo y del cerebro de 62
+especies de mamíferos terrestres. Es un `data.frame` con dos columnas
+numéricas: `body`, peso corporal en **kilogramos**, y `brain`, peso del
+cerebro en **gramos**. Los nombres de los animales están en los nombres de fila.
+
+La [ayuda de Animals2](https://search.r-project.org/CRAN/refmans/robustbase/html/Animals2.html)
+describe un `data.frame` con 65 animales terrestres: los 62 mamíferos y
+otros tres animales. Contiene las mismas variables y unidades, y se obtiene
+como unión de `MASS::Animals` y `MASS::mammals`, eliminando registros duplicados.
+
+# 2. Primera exploración: dim, head, tail y str
+
+## mammals
+
+```{r explorar-mammals, echo=TRUE}
+dim(mammals)
+head(mammals)
+tail(mammals)
+str(mammals)
+```
+
+## Animals2
+
+```{r explorar-animals2, echo=TRUE}
+dim(Animals2)
+head(Animals2)
+tail(Animals2)
+str(Animals2)
+```
+
+`mammals` tiene `r nrow(mammals)` filas y `r ncol(mammals)` columnas;
+`Animals2` tiene `r nrow(Animals2)` filas y `r ncol(Animals2)` columnas.
+Las filas representan animales y las dos columnas contienen sus pesos.
+Los conjuntos tienen un orden de filas diferente, por lo que se compararán
+por nombres y valores, en lugar de por la posición de cada fila.
+
+# 3. Nombres de las filas y las columnas
+
+```{r nombres-mammals, echo=TRUE}
+rownames(mammals)
+colnames(mammals)
+```
+
+```{r nombres-animals2, echo=TRUE}
+rownames(Animals2)
+colnames(Animals2)
+```
+
+Las columnas de ambos conjuntos son `body` y `brain`. Los nombres de las
+filas identifican a los animales; se respetan exactamente sus mayúsculas,
+espacios y grafías para la primera comparación.
+
+# 4. Animales comunes: intersect
+
+```{r animales-comunes, echo=TRUE}
+commonAnimals <- intersect(rownames(mammals), rownames(Animals2))
+commonAnimals
+length(commonAnimals)
+```
+
+Hay **`r length(commonAnimals)` nombres idénticos** en los dos conjuntos.
+`intersect` compara literalmente las etiquetas; las diferencias en los
+nombres de algunos registros se revisan en el apartado 6.
+
+# 5. Animales no comunes: setdiff
+
+```{r animales-no-comunes, echo=TRUE}
+soloMammals <- setdiff(rownames(mammals), rownames(Animals2))
+soloAnimals2 <- setdiff(rownames(Animals2), rownames(mammals))
+soloMammals
+soloAnimals2
+c(solo_mammals = length(soloMammals),
+  solo_Animals2 = length(soloAnimals2),
+  total_etiquetas_exclusivas = length(soloMammals) + length(soloAnimals2))
+```
+
+La comparación literal devuelve **`r length(soloMammals)` nombres exclusivos
+de mammals** y **`r length(soloAnimals2)` de Animals2**, en total
+**`r length(soloMammals) + length(soloAnimals2)` etiquetas exclusivas**.
+
+Los cuatro nombres de `soloMammals` corresponden a mamíferos. Entre los
+siete nombres de `soloAnimals2` hay cuatro etiquetas de mamíferos y tres
+dinosaurios: `Dipliodocus` (grafía usada en los datos), `Triceratops` y
+`Brachiosaurus`. En el siguiente apartado se comprueban las diferencias
+de etiquetado y de valores.
+
+# 6. Diferencias entre los registros no comunes
+
+## Comparación de sus pesos
+
+```{r comparar-exclusivos, echo=TRUE}
+exclusivosMammals <- data.frame(
+  nombre = soloMammals,
+  mammals[soloMammals, , drop = FALSE],
+  row.names = NULL
+)
+exclusivosAnimals2 <- data.frame(
+  nombre = soloAnimals2,
+  Animals2[soloAnimals2, , drop = FALSE],
+  row.names = NULL
+)
+knitr::kable(exclusivosMammals, caption = "Registros con nombre exclusivo de mammals")
+knitr::kable(exclusivosAnimals2, caption = "Registros con nombre exclusivo de Animals2")
+```
+
+Buscamos los pares con **los mismos pesos de cuerpo y cerebro**, manteniendo
+sus nombres originales:
+
+```{r equivalencias-etiquetas, echo=TRUE}
+equivalencias <- merge(
+  exclusivosMammals, exclusivosAnimals2,
+  by = c("body", "brain"),
+  suffixes = c("_mammals", "_Animals2")
+)
+equivalencias <- equivalencias[, c("nombre_mammals", "nombre_Animals2", "body", "brain")]
+knitr::kable(equivalencias, caption = "Pares de etiquetas con los mismos valores")
+```
+
+Los cuatro pares son `Arctic fox` / `Artic fox`, `Arctic ground squirrel` /
+`Artic ground squirrel`, `Patas monkey` / `Potar monkey` y `Mole rat` / `Mole`.
+En estos conjuntos identifican registros con valores idénticos. Esta
+comprobación explica por qué los nombres comunes son 58 aunque la ayuda
+describa 62 registros de mamíferos compartidos.
+
+## Comparación después de armonizar las cuatro etiquetas
+
+Se crea un vector auxiliar de nombres; los dos conjuntos originales y la
+variable `commonAnimals` conservan sus valores.
+
+```{r armonizar-nombres, echo=TRUE}
+mapaNombres <- setNames(equivalencias$nombre_mammals,
+                       equivalencias$nombre_Animals2)
+nombresArmonizados <- rownames(Animals2)
+pos <- match(nombresArmonizados, names(mapaNombres))
+nombresArmonizados[!is.na(pos)] <- unname(mapaNombres[pos[!is.na(pos)]])
+
+comunesArmonizados <- intersect(rownames(mammals), nombresArmonizados)
+extrasReales <- setdiff(nombresArmonizados, rownames(mammals))
+length(comunesArmonizados)
+extrasReales
+knitr::kable(
+  Animals2[match(extrasReales, nombresArmonizados), , drop = FALSE],
+  caption = "Tres registros adicionales de Animals2"
+)
+```
+
+Tras armonizar las etiquetas se reconocen **`r length(comunesArmonizados)`
+registros comunes**. Los **`r length(extrasReales)` registros adicionales**
+de `Animals2` corresponden a los tres dinosaurios.
+
+## Valores de los registros compartidos
+
+```{r comprobar-valores, echo=TRUE}
+valoresIdenticos <- all(mammals[commonAnimals, ] == Animals2[commonAnimals, ])
+valoresIdenticos
+stopifnot(
+  nrow(equivalencias) == 4L,
+  length(commonAnimals) == 58L,
+  length(comunesArmonizados) == 62L,
+  length(extrasReales) == 3L,
+  valoresIdenticos
+)
+```
+
+Los pesos de los 58 registros con el mismo nombre coinciden exactamente.
+La diferencia de tamaño entre los conjuntos se explica por los tres
+dinosaurios; las otras diferencias detectadas por `setdiff` son diferencias
+de etiquetado de cuatro registros de mamíferos.
+
+# Información de la sesión
+
+```{r informacion-sesion, echo=TRUE}
+sessionInfo()
+```

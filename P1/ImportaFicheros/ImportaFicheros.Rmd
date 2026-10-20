@@ -1,0 +1,236 @@
+---
+title: "Práctica 1. Importación de datos"
+author: "Carlos Galdámez Huertas (galhuer)"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    toc: true
+    number_sections: true
+    latex_engine: pdflatex
+    keep_tex: false
+geometry: margin=2.5cm
+fontsize: 10pt
+papersize: a4
+params:
+  lang: ES
+lang: "`r switch(params$lang, ES = 'es-ES', EN = 'en-US')`"
+subtitle: "Análisis Exploratorio de Datos. Máster en Ciencia de Datos - UV"
+language:
+  label:
+    fig: 'Figura '
+    tab: 'Tabla '
+    eq: 'Ecuación '
+    thm: 'Teorema '
+    lem: 'Lema '
+    def: 'Definición '
+    cor: 'Corolario '
+    prp: 'Proposición '
+    exm: 'Ejemplo '
+    exr: 'Ejercicio '
+    proof: 'Demostración. '
+    remark: 'Nota: '
+    solution: 'Solución. '
+editor_options:
+  markdown:
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+options(width = 75)
+opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
+               error = FALSE, comment = NA, fig.align = 'center',
+               dpi = 200, tidy = FALSE)
+library(readr)
+library(hms)
+library(haven)
+library(jsonlite)
+dir.create('results', showWarnings = FALSE)
+```
+
+# Introducción
+
+Se importaron los ficheros en data frames y se guardaron en `results`.
+Se usaron `str` para ver los tipos, `head` y `tail` para revisar los
+extremos, y `summary` para resumir las variables. Las rutas son
+relativas al proyecto.
+
+# DFP1_11122015 124700.csv
+
+El separador es un tabulador. Se compararon las lecturas de base y
+readr, y se convirtieron la fecha y la hora. Ambas lecturas contienen
+los mismos datos.
+
+```{r deposito}
+fname <- 'data/DFP1_11122015 124700.csv'
+Deposito <- read.csv(fname, sep = '\t', stringsAsFactors = FALSE)
+Deposito_readr <- read_delim(fname, delim = '\t', col_types = 'ccddd')
+all.equal(Deposito, as.data.frame(Deposito_readr),
+          check.attributes = FALSE)
+Deposito$FECHA <- as.POSIXlt(Deposito$FECHA,
+                           format = '%d/%m/%Y', tz = 'UTC')
+Deposito$HORA <- as_hms(Deposito$HORA)
+save(Deposito, file = 'results/Deposito.RData')
+dim(Deposito)
+```
+
+```{r deposito-inspeccion, results='hide'}
+str(Deposito)
+head(Deposito)
+tail(Deposito)
+Deposito_resumen <- Deposito
+Deposito_resumen$HORA <- as.numeric(Deposito_resumen$HORA)
+summary(Deposito_resumen)
+```
+
+Las horas se resumieron en segundos para evitar un fallo de formato de
+`summary` con la clase `hms`. El objeto guardado conserva la clase
+horaria.
+
+```{r capturas-deposito, echo=FALSE, out.width='100%', purl=FALSE}
+include_graphics(c('figure/01_deposito_base.jpg', 'figure/02_deposito_readr.jpg'))
+```
+
+# Transactions from a Bakery
+
+Se descargó el [fichero de
+Kaggle](https://www.kaggle.com/datasets/akashdeepkuila/bakery) y se
+previsualizó con readr en RStudio. La fecha se detectó como texto; se
+añadió su formato al código generado. Cada fila es un artículo de una
+compra.
+
+```{r bakery}
+BreadBasket <- as.data.frame(read_csv('data/bakery_sales_revised.csv',
+  col_types = cols(Transaction = col_integer(), Item = col_character(),
+    date_time = col_datetime('%m/%d/%Y %H:%M'),
+    period_day = col_character(), weekday_weekend = col_character())))
+save(BreadBasket, file = 'results/BreadBasket.RData')
+dim(BreadBasket)
+```
+
+```{r bakery-inspeccion, results='hide'}
+str(BreadBasket)
+head(BreadBasket)
+tail(BreadBasket)
+summary(BreadBasket)
+```
+
+```{r captura-bakery, echo=FALSE, out.width='100%', purl=FALSE}
+include_graphics('figure/03_bakery_readr.jpg')
+```
+
+# PsychBike.sav
+
+Se leyó con `read_sav`. Se conservaron los códigos y las etiquetas de
+SPSS.
+
+```{r psychbike}
+PsychBike <- as.data.frame(read_sav('data/PsychBike.sav'))
+save(PsychBike, file = 'results/PsychBike.RData')
+dim(PsychBike)
+```
+
+```{r psychbike-inspeccion, results='hide'}
+str(PsychBike)
+head(PsychBike)
+tail(PsychBike)
+PsychBike_resumen <- PsychBike
+PsychBike_resumen$hour <- as.numeric(PsychBike_resumen$hour)
+summary(PsychBike_resumen)
+```
+
+# iris.zip
+
+Se descargó el ZIP de [Iris en
+UCI](https://archive.ics.uci.edu/dataset/53/iris) y se descomprimió con
+`unzip`.
+
+```{r iris-zip}
+unzip('data/iris.zip', exdir = 'data')
+```
+
+# iris.data
+
+El fichero tiene comas y no tiene cabecera. Se sustituyeron las comas
+por espacios en memoria para leerlo con `read_table`. Las cuatro medidas
+están en cm.
+
+```{r iris-data}
+lineas <- readLines('data/iris.data', warn = FALSE)
+texto <- paste(gsub(',', ' ', lineas, fixed = TRUE), collapse = '\n')
+iris <- as.data.frame(read_table(I(texto), col_types = 'ddddc',
+  col_names = c('Sepal.Length', 'Sepal.Width', 'Petal.Length',
+                'Petal.Width', 'Species')))
+save(iris, file = 'results/iris.RData')
+dim(iris)
+```
+
+```{r iris-inspeccion, results='hide'}
+str(iris)
+head(iris)
+tail(iris)
+summary(iris)
+```
+
+# FileCodificado.json
+
+Se leyó con y sin simplificación. Sin `simplifyVector` se obtiene una
+lista; con `TRUE`, un data frame de 83 filas y 22 columnas.
+
+```{r codificado}
+lista <- read_json('data/FileCodificado.json')
+FileCodificado <- read_json('data/FileCodificado.json',
+                            simplifyVector = TRUE)
+class(lista)
+class(FileCodificado)
+save(FileCodificado, file = 'results/FileCodificado.RData')
+dim(FileCodificado)
+```
+
+```{r codificado-inspeccion, results='hide'}
+str(FileCodificado)
+head(FileCodificado)
+tail(FileCodificado)
+summary(FileCodificado)
+```
+
+# iris_json.json
+
+`read_json` no simplifica por defecto y `fromJSON` sí. Con la misma
+opción de simplificación dieron el mismo data frame.
+
+```{r iris-json}
+lista_iris <- read_json('data/iris_json.json')
+iris_json <- read_json('data/iris_json.json', simplifyVector = TRUE)
+iris_fromJSON <- fromJSON('data/iris_json.json')
+identical(iris_json, iris_fromJSON)
+save(iris_json, file = 'results/iris_json.RData')
+dim(iris_json)
+```
+
+```{r iris-json-inspeccion, results='hide'}
+str(iris_json)
+head(iris_json)
+tail(iris_json)
+summary(iris_json)
+```
+
+## Exportación a JSON
+
+Se cargó `iris.RData` y se exportó con ambas funciones. `pretty = TRUE`
+añadió sangría y saltos de línea; no cambió los datos.
+
+```{r exportar-json}
+load('results/iris.RData')
+write_json(iris, 'data/iris_json_v2.json', pretty = TRUE, digits = NA)
+compacto <- toJSON(iris, pretty = FALSE, digits = NA)
+legible <- toJSON(iris, pretty = TRUE, digits = NA)
+write_file(compacto, 'data/iris_compacto.json')
+write_file(legible, 'data/iris_pretty.json')
+```
+
+\clearpage
+
+```{r capturas-resultados, echo=FALSE, out.width='90%', purl=FALSE}
+include_graphics(c('figure/05_results.jpg', 'figure/04_consola.jpg'))
+```

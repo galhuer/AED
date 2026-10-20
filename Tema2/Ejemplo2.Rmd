@@ -1,0 +1,83 @@
+---
+title: "Tema 2. Ejemplo 2"
+subtitle: "Análisis Exploratorio de Datos. Máster en Ciencia de Datos - UV"
+author: "Carlos Galdámez Huertas (galhuer)"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    echo: true
+    number_sections: true
+    theme: lumen
+    toc: true
+lang: es-ES
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, error = FALSE)
+options(width = 90)
+```
+
+# Descargas
+
+Se descargaron los cinco formatos de la [tabla 2903 del INE](https://www.ine.es/jaxiT3/Tabla.htm?t=2903)
+y los dos indicadores de Gapminder. Se conservaron los archivos originales en `data`.
+
+```{r descargar}
+source('DescargarDatos.R', local = TRUE, encoding = 'UTF-8')
+kable(descargas[, c('Fuente', 'Formato', 'Archivo')], row.names = FALSE)
+```
+
+# Población de Valencia
+
+Se leyeron los dos CSV y se quitaron los puntos de miles para obtener enteros.
+
+```{r poblacion}
+leer_ine <- function(archivo, separador) {
+  datos <- read.table(archivo, header = TRUE, sep = separador, quote = '"',
+    comment.char = '', fileEncoding = 'UTF-8-BOM', colClasses = 'character',
+    check.names = FALSE, na.strings = c('', '..'))
+  datos$Periodo <- as.integer(datos$Periodo)
+  datos$Total <- as.integer(gsub('.', '', datos$Total, fixed = TRUE))
+  datos
+}
+poblacion <- leer_ine('data/INE/Valencia_poblacion_punto_coma.csv', ';')
+poblacion_tab <- leer_ine('data/INE/Valencia_poblacion_tab.csv', '\t')
+identical(poblacion, poblacion_tab)
+dim(poblacion)
+ultimo <- max(poblacion$Periodo)
+municipios <- subset(poblacion, grepl('^[0-9]{5} ', Municipios) &
+                       Sexo == 'Total' & Periodo == ultimo)
+nrow(municipios)
+sum(municipios$Total)
+dir.create('resultados', showWarnings = FALSE)
+write.csv(municipios, 'resultados/Poblacion_municipios.csv', row.names = FALSE)
+```
+
+Los CSV coinciden. Hay `r nrow(municipios)` municipios en `r ultimo` y suman
+`r format(sum(municipios$Total), big.mark='.', decimal.mark=',', scientific=FALSE, trim=TRUE)` habitantes.
+
+## Codificación
+
+Se consultó la cabecera del PC-Axis: declara ISO-8859-15, que conserva las tildes.
+
+```{r codificacion}
+conexion <- file('data/INE/Valencia_poblacion.px', encoding = 'ISO-8859-15')
+cabecera <- readLines(conexion, n = 20, warn = FALSE)
+close(conexion)
+cabecera[grepl('^(CHARSET|CODEPAGE|TITLE)=', cabecera)]
+```
+
+# Gapminder
+
+Se descargaron [Babies per woman](https://www.gapminder.org/data/documentation/gd008/)
+y [Child mortality](https://www.gapminder.org/data/documentation/gd005/).
+Las unidades son hijos por mujer y muertes de menores de cinco años por 1000 nacidos vivos.
+Free data from Gapminder.org.
+
+```{r gapminder}
+fertilidad <- read.csv('data/Gapminder/Babies_per_woman.csv', check.names = FALSE)
+mortalidad <- read.csv('data/Gapminder/Child_mortality.csv', check.names = FALSE)
+head(fertilidad, 3)
+head(mortalidad, 3)
+```

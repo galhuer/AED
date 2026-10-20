@@ -1,0 +1,80 @@
+---
+title: "Tema 1. Conjuntos de datos"
+subtitle: "Análisis Exploratorio de Datos. Máster en Ciencia de Datos - UV"
+author: "Carlos Galdámez Huertas (galhuer)"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    echo: true
+    number_sections: true
+    theme: lumen
+    toc: true
+lang: es-ES
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, error = FALSE)
+options(width = 90)
+dir.create('resultados', showWarnings = FALSE)
+```
+
+# Plantilla
+
+Se adaptó la plantilla con secciones, código, tabla, figura y referencia.
+
+# Datos de signal y ggmap
+
+Se consultaron los catálogos con `data`.
+
+```{r catalogos}
+data(package = 'signal')$results[, 'Item']
+data(package = 'ggmap')$results[, 'Item']
+```
+
+`signal` contiene `wav`; `ggmap`, `crime`, `hadley`, `wind` y `zips`.
+
+# Variables de crabs
+
+```{r crabs}
+data('crabs', package = 'MASS')
+dim(crabs)
+tipos <- data.frame(Variable = names(crabs),
+  Clase = vapply(crabs, function(x) class(x)[1], character(1)),
+  Tipo = c('Nominal', 'Nominal', 'Identificador', rep('Continua', 5)))
+kable(tipos, row.names = FALSE, caption = 'Tipos de las variables de crabs.')
+```
+
+Hay 200 filas y 8 columnas. `sp` y `sex` son factores; `index` identifica
+cada cangrejo dentro de su grupo. Las otras cinco variables son medidas en mm,
+según la [ayuda de MASS](https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/crabs.html).
+
+```{r figura-crabs, fig.cap='Longitud y anchura del caparazón.', fig.width=6, fig.height=4}
+plot(crabs$CL, crabs$CW, xlab = 'Longitud (mm)', ylab = 'Anchura (mm)')
+```
+
+# MASS: al menos cinco factores
+
+Se cargó cada entrada y se contaron las columnas de clase factor.
+
+```{r factores}
+catalogo <- unique(data(package = 'MASS')$results[, 'Item'])
+recuento <- list()
+for (nombre in catalogo) {
+  entorno <- new.env()
+  data(list = nombre, package = 'MASS', envir = entorno)
+  for (objeto in ls(entorno)) {
+    datos <- get(objeto, envir = entorno)
+    recuento[[objeto]] <- data.frame(Conjunto = objeto,
+      Factores = if (is.data.frame(datos)) sum(vapply(datos, is.factor, logical(1))) else 0)
+  }
+}
+recuento <- do.call(rbind, recuento)
+seleccion <- recuento[recuento$Factores >= 5, ]
+kable(seleccion, row.names = FALSE)
+nrow(seleccion)
+write.csv(recuento, 'resultados/Recuento_MASS.csv', row.names = FALSE)
+write.csv(tipos, 'resultados/Tipos_crabs.csv', row.names = FALSE)
+```
+
+Son cuatro: `Cars93` (9 factores), `bacteria` (5), `shuttle` (7) y `survey` (7).

@@ -1,0 +1,3 @@
+Abrir el proyecto de RStudio. Ejecutar instalar_paquetes.R una vez y ejecutar.R.
+Tema2.html contiene los ejercicios y ejemplos; Ejemplo2.html detalla la descarga.
+Los datos de clase y los descargados están en data.

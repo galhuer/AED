@@ -1,0 +1,2 @@
+Abrir el proyecto de RStudio. Ejecutar instalar_paquetes.R una vez y ejecutar.R.
+La memoria es ConjuntosDatos.html.

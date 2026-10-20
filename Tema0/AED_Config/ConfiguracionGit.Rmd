@@ -1,0 +1,101 @@
+---
+title: "Verificación de la configuración Git y GitHub"
+author: "Carlos Galdámez Huertas (galhuer)"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    echo: true
+    number_sections: true
+    theme: lumen
+    toc: true
+  bookdown::pdf_document2:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+    figure_caption: "Figura" # Referencias en castellano
+    table_caption: "Tabla"
+  html_notebook:
+    echo: true
+    number_sections: true
+    toc: true
+  pdf_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+  bookdown::html_document2:
+    echo: true
+    number_sections: true
+    theme: spacelab
+    toc: true
+    figure_caption: "Figura"
+    table_caption: "Tabla"
+always_allow_html: true
+params:
+  lang: ES
+lang: "`r switch(params$lang, ES = 'es-ES', EN = 'en-US')`"
+subtitle: "Análisis Exploratorio de Datos. Máster en Ciencia de Datos - UV"
+language:
+  label:
+    fig: 'Figura '
+    tab: 'Tabla '
+    eq: 'Ecuación '
+    thm: 'Teorema '
+    lem: 'Lema '
+    def: 'Definición '
+    cor: 'Corolario '
+    prp: 'Proposición '
+    exm: 'Ejemplo '
+    exr: 'Ejercicio '
+    proof: 'Demostración. '
+    remark: 'Nota: '
+    solution: 'Solución. '
+---
+
+```{r setup, cache = F, echo = F, message = F, warning = F, tidy = F}
+
+
+# CONFIGURACIÓN GENERAL
+library(knitr)
+options(width = 100)
+
+# Opciones generales de los chucks. Se utilizarán salvo cambios en el chunk
+opts_chunk$set(echo=F, message = F, error = F, warning = F, comment = NA, fig.align = 'center', dpi = 200, tidy = F, cache.path = '.cache/', fig.path = './figura/')
+
+# Opciones generales de dígitos cuando se incluyen tablas
+#options(xtable.type = 'html')
+knit_hooks$set(inline = function(x) {
+
+  if(is.numeric(x)) {
+    round(x, getOption('digits'))
+  } else {
+    paste(as.character(x), collapse = ', ')
+  }
+})
+#knit_hooks$set(plot = knitr:::hook_plot_html)
+```
+
+# Introducción
+
+Práctica de configuración de Git y GitHub para Análisis Exploratorio de Datos.
+El documento se ha creado a partir de `Plantilla_Practicas_v3.Rmd`.
+
+**Alumno:** Carlos Galdámez Huertas. **Usuario UV y GitHub:** galhuer.
+
+# Área de un círculo
+
+Calculamos el área mediante $A = \pi r^2$, con un radio de 0.5 unidades.
+
+```{r area-circulo, echo=TRUE}
+radio <- 0.5
+area_circulo <- pi * radio^2
+area_circulo
+```
+
+El área es `r round(area_circulo, 4)` unidades cuadradas.
+
+# Flujo de trabajo
+
+El primer commit conserva el RMarkdown de la plantilla original. El segundo
+personaliza la práctica e incorpora el cálculo del círculo. Al finalizar se
+envían los commits a GitHub mediante **PUSH**. En futuras sesiones, el primer
+paso será **PULL** para descargar las actualizaciones de los colaboradores.
