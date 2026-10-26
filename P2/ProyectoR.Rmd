@@ -199,3 +199,21 @@ grafico12 <- ggplot(Experimento, aes(x = Dosis, y = Altura, colour = Complemento
 grafico12
 ggsave('Results/Ejercicio5.pdf', plot = grafico12)
 ```
+
+# Ejercicio 6
+
+Se representaron los caudales a lo largo del tiempo: `flow.vat` en rojo y
+`flow.jok` en azul. Se añadieron el título y las etiquetas con `labs()`.
+
+```{r ejercicio6, fig.path = 'Results/'}
+load('data/iceRiver.RData')
+
+grafico13 <- ggplot(ice.river.df, aes(x = time)) +
+  geom_line(aes(y = flow.vat, colour = 'flow.vat')) +
+  geom_line(aes(y = flow.jok, colour = 'flow.jok')) +
+  scale_colour_manual(values = c('flow.vat' = 'red', 'flow.jok' = 'blue')) +
+  labs(title = 'Caudal de dos ríos islandeses',
+       x = 'Año', y = 'Caudal', colour = 'Río')
+grafico13
+ggsave('Results/Ejercicio6.pdf', plot = grafico13)
+```
