@@ -217,3 +217,27 @@ grafico13 <- ggplot(ice.river.df, aes(x = time)) +
 grafico13
 ggsave('Results/Ejercicio6.pdf', plot = grafico13)
 ```
+
+# Ejercicio 7
+
+Se hicieron boxplots de `MinTemp` y violines de `MaxTemp` por año.
+Se ocultó la leyenda con [`theme()`](https://ggplot2.tidyverse.org/reference/theme.html)
+y se giraron los años 45° con [`element_text()`](https://ggplot2.tidyverse.org/reference/element.html).
+
+```{r ejercicio7, fig.path = 'Results/'}
+load('data/weatherAUS_distributions.RData')
+
+grafico14 <- ggplot(ds, aes(x = Year, y = MinTemp)) + geom_boxplot()
+grafico14
+
+grafico15 <- ggplot(ds, aes(x = Year, y = MaxTemp, fill = Year)) +
+  geom_violin() +
+  labs(title = 'Distribución de temperaturas máximas por año',
+       x = 'Año', y = 'Temperatura (ºC)')
+grafico15
+
+grafico16 <- grafico15 + theme(legend.position = 'none',
+                              axis.text.x = element_text(angle = 45, hjust = 1))
+grafico16
+ggsave('Results/Ejercicio7.pdf', plot = grafico16)
+```
