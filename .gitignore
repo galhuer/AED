@@ -23,3 +23,7 @@
 *.png
 *.jpg
 !/P1/ImportaFicheros/ImportaFicheros.pdf
+!/P2/
+/P2/*
+!/P2/ProyectoR.Rmd
+!/P2/ProyectoR.pdf

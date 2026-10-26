@@ -1,0 +1,45 @@
+---
+title: "Práctica 2. Visualización de Datos"
+author: "Carlos Galdámez Huertas (galhuer)"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+params:
+  lang: ES
+lang: "`r switch(params$lang, ES = 'es-ES', EN = 'en-US')`"
+subtitle: "Análisis Exploratorio de Datos. Máster en Ciencia de Datos - UV"
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+options(width = 100)
+opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
+              error = FALSE, comment = NA, fig.align = 'center',
+              dpi = 200, tidy = FALSE, fig.path = 'Results/')
+dir.create('Results', showWarnings = FALSE)
+```
+
+# Ejercicio 1
+
+Se cargaron los datos y se representaron las temperaturas mínima y máxima.
+Se añadió el color según `RainTomorrow` y un título al gráfico final,
+guardado en `Results/Ejercicio1.pdf`.
+
+```{r ejercicio1}
+library(ggplot2)
+load('data/weatherAUS.RData')
+
+grafico1 <- ggplot(ds, aes(x = MinTemp, y = MaxTemp)) + geom_point()
+grafico1
+
+grafico2 <- ggplot(ds, aes(x = MinTemp, y = MaxTemp,
+                           colour = RainTomorrow)) + geom_point()
+grafico2
+
+grafico3 <- grafico2 + ggtitle('Temperaturas mínimas y máximas')
+grafico3
+ggsave('Results/Ejercicio1.pdf', plot = grafico3)
+```
