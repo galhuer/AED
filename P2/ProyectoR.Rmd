@@ -123,3 +123,28 @@ grafico6 <- grafico6 + labs(title = 'Temperatura y presión a las 9 h',
 grafico6
 ggsave('Results/Ejercicio2.pdf', plot = grafico6)
 ```
+
+# Ejercicio 3
+
+Se reorganizó `iris.RData` y se guardó como `iris.tidy.RData`.
+En columnas es más fácil comparar las medidas con una escala vertical
+común. Con `geom_jitter()` se reduce el solapamiento de los puntos.
+
+```{r ejercicio3, fig.path = 'Results/'}
+load('data/iris.tidy.RData')
+str(iris.tidy)
+
+iris.grafico1 <- ggplot(iris.tidy, aes(x = Species, y = Value)) + geom_point()
+iris.grafico1
+
+iris.grafico2 <- iris.grafico1 + aes(colour = Part)
+iris.grafico2
+
+iris.grafico2 + facet_grid(Measure ~ .)
+iris.grafico2 + facet_grid(. ~ Measure)
+
+iris.grafico3 <- ggplot(iris.tidy, aes(x = Species, y = Value, colour = Part)) +
+  geom_jitter() + facet_grid(. ~ Measure)
+iris.grafico3
+ggsave('Results/Ejercicio3.pdf', plot = iris.grafico3)
+```
