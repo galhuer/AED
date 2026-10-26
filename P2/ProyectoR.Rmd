@@ -148,3 +148,25 @@ iris.grafico3 <- ggplot(iris.tidy, aes(x = Species, y = Value, colour = Part)) +
 iris.grafico3
 ggsave('Results/Ejercicio3.pdf', plot = iris.grafico3)
 ```
+
+# Ejercicio 4
+
+Los puntos permiten ver la evolución de las ventas. Las líneas facilitan
+seguir cada fabricante; se diferenciaron por color y tipo de línea.
+
+```{r ejercicio4, fig.path = 'Results/'}
+load('data/Ejercicio4_Data.Rdata')
+str(DatosEjer4)
+
+grafico7 <- ggplot(DatosEjer4, aes(x = Fecha, y = Ventas,
+                                  colour = Fabricante)) + geom_point()
+grafico7
+
+grafico8 <- grafico7 + geom_line()
+grafico8
+
+grafico9 <- grafico7 + geom_line(aes(linetype = Fabricante)) +
+  ggtitle('Ventas mensuales de diferentes compañías tecnológicas')
+grafico9
+ggsave('Results/Ejercicio4.pdf', plot = grafico9)
+```
