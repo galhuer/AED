@@ -170,3 +170,32 @@ grafico9 <- grafico7 + geom_line(aes(linetype = Fabricante)) +
 grafico9
 ggsave('Results/Ejercicio4.pdf', plot = grafico9)
 ```
+
+# Ejercicio 5
+
+Se representó la altura por dosis y complemento, con barras de error.
+En el último gráfico se usó la paleta `Reds` y se definieron la forma y
+el tipo de línea en sus capas.
+
+```{r ejercicio5, fig.path = 'Results/'}
+load('data/Experimento.Rdata')
+str(Experimento)
+
+grafico10 <- ggplot(Experimento, aes(x = Dosis, y = Altura,
+                    shape = Complemento, linetype = Complemento)) +
+  geom_point() + geom_line()
+grafico10
+
+grafico11 <- grafico10 + geom_errorbar(aes(ymin = Altura - Error_Altura,
+                                          ymax = Altura + Error_Altura), width = 0.1)
+grafico11
+
+grafico12 <- ggplot(Experimento, aes(x = Dosis, y = Altura, colour = Complemento)) +
+  geom_point(aes(shape = Complemento)) +
+  geom_line(aes(linetype = Complemento)) +
+  geom_errorbar(aes(ymin = Altura - Error_Altura, ymax = Altura + Error_Altura,
+                    linetype = Complemento), width = 0.1) +
+  scale_color_brewer(palette = 'Reds')
+grafico12
+ggsave('Results/Ejercicio5.pdf', plot = grafico12)
+```
