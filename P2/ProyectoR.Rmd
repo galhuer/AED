@@ -59,7 +59,7 @@ library(knitr)
 options(width = 100)
 
 # Opciones generales de los chucks. Se utilizarán salvo cambios en el chunk
-opts_chunk$set(echo=F, message = F, error = F, warning = F, comment = NA, fig.align = 'center', dpi = 200, tidy = F, cache.path = '.cache/', fig.path = './figura/')
+opts_chunk$set(echo=F, message = F, error = F, warning = F, comment = NA, fig.align = 'center', dpi = 100, tidy = F, cache.path = '.cache/', fig.path = './figura/')
 
 # Opciones generales de dígitos cuando se incluyen tablas
 #options(xtable.type = 'html')
@@ -84,7 +84,7 @@ pacman::p_load(char=packages)
 
 Se cargaron los datos y se representaron las temperaturas mínima y máxima. Se añadió el color según `RainTomorrow` y un título al gráfico final, guardado en `Results/Ejercicio1.pdf`.
 
-```{r ejercicio1, fig.path = 'Results/'}
+```{r ejercicio1, echo = TRUE, fig.path = 'Results/'}
 dir.create('Results', showWarnings = FALSE)
 load('data/weatherAUS.RData')
 
@@ -102,11 +102,9 @@ ggsave('Results/Ejercicio1.pdf', plot = grafico3)
 
 # Ejercicio 2
 
-Se representaron `Temp9am` y `Pressure9am`. El color distingue mejor
-los grupos de `RainToday` que la forma. Se añadieron las etiquetas y
-se guardó el gráfico en `Results/Ejercicio2.pdf`.
+Se representaron `Temp9am` y `Pressure9am`. El color distingue mejor los grupos de `RainToday` que la forma. Se añadieron las etiquetas y se guardó el gráfico en `Results/Ejercicio2.pdf`.
 
-```{r ejercicio2, fig.path = 'Results/'}
+```{r ejercicio2, echo = TRUE, fig.path = 'Results/'}
 grafico4 <- ggplot(ds, aes(x = Temp9am, y = Pressure9am)) + geom_point()
 grafico4
 
@@ -126,11 +124,9 @@ ggsave('Results/Ejercicio2.pdf', plot = grafico6)
 
 # Ejercicio 3
 
-Se reorganizó `iris.RData` y se guardó como `iris.tidy.RData`.
-En columnas es más fácil comparar las medidas con una escala vertical
-común. Con `geom_jitter()` se reduce el solapamiento de los puntos.
+Se reorganizó `iris.RData` y se guardó como `iris.tidy.RData`. En columnas es más fácil comparar las medidas con una escala vertical común. Con `geom_jitter()` se reduce el solapamiento de los puntos.
 
-```{r ejercicio3, fig.path = 'Results/'}
+```{r ejercicio3, echo = TRUE, fig.path = 'Results/'}
 load('data/iris.tidy.RData')
 str(iris.tidy)
 
@@ -151,10 +147,9 @@ ggsave('Results/Ejercicio3.pdf', plot = iris.grafico3)
 
 # Ejercicio 4
 
-Los puntos permiten ver la evolución de las ventas. Las líneas facilitan
-seguir cada fabricante; se diferenciaron por color y tipo de línea.
+Los puntos permiten ver la evolución de las ventas. Las líneas facilitan seguir cada fabricante; se diferenciaron por color y tipo de línea.
 
-```{r ejercicio4, fig.path = 'Results/'}
+```{r ejercicio4, echo = TRUE, fig.path = 'Results/'}
 load('data/Ejercicio4_Data.Rdata')
 str(DatosEjer4)
 
@@ -173,11 +168,9 @@ ggsave('Results/Ejercicio4.pdf', plot = grafico9)
 
 # Ejercicio 5
 
-Se representó la altura por dosis y complemento, con barras de error.
-En el último gráfico se usó la paleta `Reds` y se definieron la forma y
-el tipo de línea en sus capas.
+Se representó la altura por dosis y complemento, con barras de error. En el último gráfico se usó la paleta `Reds` y se definieron la forma y el tipo de línea en sus capas.
 
-```{r ejercicio5, fig.path = 'Results/'}
+```{r ejercicio5, echo = TRUE, fig.path = 'Results/'}
 load('data/Experimento.Rdata')
 str(Experimento)
 
@@ -202,10 +195,9 @@ ggsave('Results/Ejercicio5.pdf', plot = grafico12)
 
 # Ejercicio 6
 
-Se representaron los caudales a lo largo del tiempo: `flow.vat` en rojo y
-`flow.jok` en azul. Se añadieron el título y las etiquetas con `labs()`.
+Se representaron los caudales a lo largo del tiempo: `flow.vat` en rojo y `flow.jok` en azul. Se añadieron el título y las etiquetas con `labs()`.
 
-```{r ejercicio6, fig.path = 'Results/'}
+```{r ejercicio6, echo = TRUE, fig.path = 'Results/'}
 load('data/iceRiver.RData')
 
 grafico13 <- ggplot(ice.river.df, aes(x = time)) +
@@ -220,11 +212,9 @@ ggsave('Results/Ejercicio6.pdf', plot = grafico13)
 
 # Ejercicio 7
 
-Se hicieron boxplots de `MinTemp` y violines de `MaxTemp` por año.
-Se ocultó la leyenda con [`theme()`](https://ggplot2.tidyverse.org/reference/theme.html)
-y se giraron los años 45° con [`element_text()`](https://ggplot2.tidyverse.org/reference/element.html).
+Se hicieron boxplots de `MinTemp` y violines de `MaxTemp` por año. Se ocultó la leyenda con [`theme()`](https://ggplot2.tidyverse.org/reference/theme.html) y se giraron los años 45° con [`element_text()`](https://ggplot2.tidyverse.org/reference/element.html).
 
-```{r ejercicio7, fig.path = 'Results/'}
+```{r ejercicio7, echo = TRUE, fig.path = 'Results/'}
 load('data/weatherAUS_distributions.RData')
 
 grafico14 <- ggplot(ds, aes(x = Year, y = MinTemp)) + geom_boxplot()
@@ -244,11 +234,9 @@ ggsave('Results/Ejercicio7.pdf', plot = grafico16)
 
 # Ejercicio 8
 
-Se leyó [chol.txt](https://assets.datacamp.com/blog_assets/chol.txt), descargado de DataCamp.
-Se usaron 20 intervalos de 2 cm y se ajustó la curva a la escala de
-frecuencias. El gráfico final se separó por `MORT`.
+Se leyó [chol.txt](https://assets.datacamp.com/blog_assets/chol.txt), descargado de DataCamp. Se usaron 20 intervalos de 2 cm y se ajustó la curva a la escala de frecuencias. El gráfico final se separó por `MORT`.
 
-```{r ejercicio8, fig.path = 'Results/'}
+```{r ejercicio8, echo = TRUE, fig.path = 'Results/'}
 chol <- read.table('data/chol.txt', header = TRUE)
 
 grafico17 <- ggplot(chol, aes(x = HEIGHT)) +
