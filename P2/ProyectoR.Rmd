@@ -241,3 +241,28 @@ grafico16 <- grafico15 + theme(legend.position = 'none',
 grafico16
 ggsave('Results/Ejercicio7.pdf', plot = grafico16)
 ```
+
+# Ejercicio 8
+
+Se leyó [chol.txt](https://assets.datacamp.com/blog_assets/chol.txt), descargado de DataCamp.
+Se usaron 20 intervalos de 2 cm y se ajustó la curva a la escala de
+frecuencias. El gráfico final se separó por `MORT`.
+
+```{r ejercicio8, fig.path = 'Results/'}
+chol <- read.table('data/chol.txt', header = TRUE)
+
+grafico17 <- ggplot(chol, aes(x = HEIGHT)) +
+  geom_histogram(breaks = seq(155, 195, by = 2),
+                 fill = 'blue', colour = 'red', alpha = 0.5) +
+  scale_x_continuous(limits = c(155, 195), expand = c(0, 0)) +
+  labs(title = 'Histograma de la variable Altura',
+       x = 'Altura (cm)', y = 'Frecuencia')
+grafico17
+
+grafico18 <- grafico17 + geom_density(aes(y = after_stat(count) * 2), colour = 'green')
+grafico18
+
+grafico19 <- grafico18 + facet_grid(MORT ~ .)
+grafico19
+ggsave('Results/Ejercicio8.pdf', plot = grafico19)
+```
