@@ -1,0 +1,150 @@
+---
+title: "Tema 4. Ejercicios de texto"
+author: "Carlos Galdámez Huertas (galhuer)"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    toc: true
+    number_sections: true
+lang: es-ES
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(dplyr)
+library(stringr)
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
+                      error = FALSE, comment = NA, fig.align = 'center',
+                      fig.width = 7, fig.height = 4, fig.path = 'figure/')
+dir.create('resultados', showWarnings = FALSE)
+```
+
+# Nombres de cpus
+
+Se buscaron los nombres que no contienen las letras a, e o i.
+
+```{r cpus}
+data('cpus', package = 'MASS', envir = environment())
+nombres <- as.character(cpus$name)
+nombres[!grepl('[aei]', nombres, ignore.case = TRUE)]
+```
+
+# Correos de la UV
+
+Se comprobó la expresión en [regex101](https://regex101.com/) con direcciones
+de prueba. [Ver captura](resultados/regex101.png).
+
+```{r correos-uv}
+correos_uv <- c('paco5@alumni.uv.es', 'vifranjo@uv.es',
+                'martsobm@uv.es', 'pascal@gmail.com', 'ménfor@alumni.es')
+patron_uv <- '^[A-Za-z0-9._%+-]+@(alumni\\.)?uv\\.es$'
+data.frame(correo = correos_uv, valido = grepl(patron_uv, correos_uv))
+```
+
+# La Celestina
+
+Desde la línea 265, la palabra más frecuente es `que` y la vocal más
+frecuente es `e` sin acento. Se menciona más a Calisto que a Melibea.
+
+```{r celestina}
+lineas <- readLines('data/LaCelestina.txt', encoding = 'UTF-8', warn = FALSE)
+texto <- tolower(paste(lineas[265:length(lineas)], collapse = ' '))
+palabras <- str_extract_all(texto, '\\p{L}+')[[1]]
+head(sort(table(palabras), decreasing = TRUE))
+
+vocales <- str_extract_all(texto, '[aáeéiíoóuúü]')[[1]]
+table(factor(vocales, levels = c('a','á','e','é','i','í','o','ó','u','ú','ü')))
+table(factor(palabras[palabras %in% c('calisto', 'melibea')],
+             levels = c('calisto', 'melibea')))
+```
+
+# Caracteres de El Lazarillo
+
+Se contaron todos los caracteres, distinguiendo mayúsculas y minúsculas.
+Los saltos de línea y espacios se identifican en las etiquetas.
+
+```{r lazarillo}
+archivo <- 'data/lazarillo.txt'
+con <- file(archivo, 'rb')
+texto <- readChar(con, file.info(archivo)$size, useBytes = TRUE)
+close(con)
+Encoding(texto) <- 'UTF-8'
+texto <- sub('^\ufeff', '', texto)
+caracteres <- strsplit(texto, '', fixed = TRUE)[[1]]
+freq <- as.data.frame(table(caracteres))
+names(freq) <- c('caracter', 'frecuencia')
+freq$etiqueta <- recode(as.character(freq$caracter),
+                        ' ' = '[espacio]', '\r' = '[retorno]', '\n' = '[salto]')
+head(freq[order(-freq$frecuencia), c('etiqueta', 'frecuencia')], 10)
+
+original <- ggplot(freq, aes(x = etiqueta, y = frecuencia)) +
+  geom_col() + coord_flip() + labs(x = 'Carácter', y = 'Frecuencia')
+ordenado <- ggplot(freq, aes(x = reorder(etiqueta, frecuencia), y = frecuencia)) +
+  geom_col() + coord_flip() + labs(x = 'Carácter', y = 'Frecuencia')
+ggsave('resultados/Lazarillo.pdf', original, width = 9, height = 18)
+ggsave('resultados/Lazarillo_ordenado.pdf', ordenado, width = 9, height = 18)
+```
+
+[Gráfico de caracteres](resultados/Lazarillo.pdf) y
+[gráfico ordenado](resultados/Lazarillo_ordenado.pdf).
+
+# Texto y expresiones regulares
+
+Se eliminaron `#` y `@`, se extrajeron etiquetas y se contaron las palabras.
+
+```{r tweets}
+tw <- c(
+  paste0('Nunca olvides que… ¡la vida es un carnaval!\n',
+         'Never forguet that… ¡life is a carnival!\n',
+         '#Carnaval #Carnival… https://t.co/pRjgvNf8DZ'),
+  paste0('\U0001f4c6Evento #fallas | Visita de la fallera mayor ',
+         'y corte de honor a la Ciudad del Artista Fallero en'),
+  paste0('RT @PacmaValencia: "De nuevo la tauromaquia impregnará de ',
+         'sufrimiento y muerte las #fallas. De nuevo la tauromaquia ',
+         'se apropiará de nuestra…'),
+  paste0('RT @SimarroFerret_: #Marzo es el #mesdelapaella por excelencia. ',
+         'Por eso hemos preparado para ti esta gran #oferta. ',
+         'Pasa por nuestras #ferre…'),
+  paste0('RT @AirNostrumLAM: #Valencia en marzo es sinónimo de pólvora, ',
+         'fuego, música y fiesta. Disfruta cada día de la espectacular ',
+         '#Mascletá y prep…')
+)
+tw_sin_simbolos <- gsub('#|@', '', tw)
+cat(strwrap(tw_sin_simbolos[1], width = 70), sep = '\n')
+str_extract_all(tw, '[#@][\\p{L}0-9_]+')
+tw_sin_puntuacion <- str_replace_all(tw, '[[:punct:]]', ' ')
+palabras_tw <- unlist(str_extract_all(tw_sin_puntuacion, '[[:alnum:]]+'))
+head(sort(table(palabras_tw), decreasing = TRUE), 10)
+```
+
+Se extrajeron los correos de ejemplo por dominio y los terminados en
+`.com` o `.net` del texto.
+
+```{r correos}
+texto_correos <- paste(c('hola@.net', 'direccion@.es',
+  'munge@yahoo.com', 'gommix@att.net', 'lamprecht@mac.com',
+  'mstrout@att.net', 'Lukka@outlook.com', 'burniske@optonline.net',
+  'isaacson@verizon.net', 'cgreuter@gmail.com', 'uncled@me.com',
+  'jsnover@verizon.net', 'dinther@hotmail.com', 'jshearer@sbcglobal.net',
+  'Esto@nolodebe.detectar'), collapse = '\n')
+patron_correo <- '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.(com|net)\\b'
+todos <- str_extract_all(texto_correos, patron_correo)[[1]]
+todos[grepl('\\.net$', todos)]
+todos[grepl('@outlook\\.com$', todos)]
+todos[grepl('@(gmail|yahoo)\\.com$', todos)]
+todos[grepl('@(gmail\\.com|verizon\\.net)$', todos)]
+todos
+```
+
+`\\w` identifica letras, números y guion bajo; `\\W`, los demás caracteres.
+El punto busca un carácter y `.+` una secuencia. `grep` selecciona textos
+con signos de puntuación y `str_locate_all()` devuelve sus posiciones.
+
+```{r patrones}
+lengths(str_extract_all(tw, '\\W'))
+lengths(str_extract_all(tw, '\\w+'))
+lengths(str_extract_all(tw, '.'))
+lengths(str_extract_all(tw, '.+'))
+length(grep('[[:punct:]]', tw, value = TRUE))
+lapply(str_locate_all(tw, '[[:punct:]]'), head, 3)
+```

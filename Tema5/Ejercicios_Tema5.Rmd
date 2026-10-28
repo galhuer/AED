@@ -1,0 +1,168 @@
+---
+title: "Tema 5. Ejercicios de manejo de datos"
+author: "Carlos Galdámez Huertas (galhuer)"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    toc: true
+    number_sections: true
+lang: es-ES
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
+                      error = FALSE, comment = NA, fig.align = 'center',
+                      fig.width = 7, fig.height = 4, fig.path = 'figure/')
+```
+
+# Nuevas variables con mutate
+
+Se calcularon la suma y la media de las dos variables del ejemplo.
+
+```{r nuevas-variables}
+mydata <- data.frame(x1 = c(2, 2, 6, 4), x2 = c(3, 4, 2, 8))
+mydata %>% mutate(sumx = x1 + x2, meanx = (x1 + x2) / 2)
+```
+
+# Hora de llegada de los vuelos
+
+Se busca cada ciudad en `world.cities` y se obtiene su zona horaria con
+`lutz`. Si hay nombres repetidos, se elige la localidad más poblada.
+
+```{r vuelos}
+vuelos <- data.frame(destino = c('Sydney', 'Buenos Aires', 'Honolulu'),
+                     duracion = c(22, 13, 15))
+data(world.cities, package = 'maps', envir = environment())
+ciudades <- world.cities[order(world.cities$pop, decreasing = TRUE), ]
+pos <- match(vuelos$destino, ciudades$name)
+stopifnot(!anyNA(pos))
+vuelos$pais <- ciudades$country.etc[pos]
+vuelos$zona <- lutz::tz_lookup_coords(ciudades$lat[pos], ciudades$long[pos],
+                                      method = 'accurate')
+salida <- as.POSIXct('2023-02-23 22:30', tz = 'Europe/Madrid')
+vuelos$llegada <- mapply(function(h, zona) {
+  format(salida + h * 3600, '%d-%m-%Y %H:%M', tz = zona)
+}, vuelos$duracion, vuelos$zona, USE.NAMES = FALSE)
+knitr::kable(vuelos, row.names = FALSE)
+```
+
+# Caudal de los ríos
+
+Se pasó el conjunto a formato largo y se representaron los dos caudales.
+
+```{r rios}
+load('data/iceRiver.RData')
+ice.river.df %>%
+  pivot_longer(c(flow.vat, flow.jok), names_to = 'rio', values_to = 'caudal') %>%
+  ggplot(aes(x = time, y = caudal, colour = rio)) +
+  geom_line() + labs(x = 'Año', y = 'Caudal', colour = 'Río')
+```
+
+# Transformación de iris
+
+Las columnas quedaron en el orden pedido: parte, medida, valor y especie.
+
+```{r iris-largo}
+iris.tidy <- iris %>%
+  pivot_longer(-Species, names_to = c('ParteFlor', 'TipoMedida'),
+               names_sep = '\\.', values_to = 'Valor') %>%
+  rename(Especie = Species) %>%
+  select(ParteFlor, TipoMedida, Valor, Especie)
+head(iris.tidy)
+```
+
+# Fecundidad entre 1945 y 2025
+
+Se observan repuntes en varios países a mediados del siglo XX. La serie
+mide hijos por mujer, no el número total de nacimientos.
+
+```{r fecundidad}
+fertilidad <- read.csv('data/children_per_woman_total_fertility.csv',
+                       check.names = FALSE)
+paises <- c('Spain', 'France', 'Germany', 'Portugal', 'Italy')
+fertilidad_larga <- fertilidad %>%
+  filter(country %in% paises) %>%
+  pivot_longer(all_of(as.character(1945:2025)), names_to = 'anio',
+               values_to = 'hijos', names_transform = list(anio = as.integer))
+ggplot(fertilidad_larga, aes(x = anio, y = hijos, colour = country)) +
+  geom_line() + labs(x = 'Año', y = 'Hijos por mujer', colour = 'País')
+```
+
+# Resumen de Gapminder
+
+Se calcula un resumen para cada continente y año. Se muestra 2007, el
+último año disponible, para sumar poblaciones del mismo momento.
+
+```{r gapminder}
+continentes <- gapminder::gapminder %>%
+  group_by(continent, year) %>%
+  summarise(esperanza_vida = mean(lifeExp), renta = mean(gdpPercap),
+            poblacion = sum(pop), .groups = 'drop') %>%
+  arrange(desc(esperanza_vida))
+continentes %>% filter(year == max(year))
+```
+
+# Formato largo y ancho
+
+Se transformaron las columnas por nombre, posición y exclusión; las tres
+selecciones dan el mismo resultado. Después se recuperó el formato ancho.
+
+```{r largo-ancho}
+set.seed(1)
+ex_wide <- data.frame(id = paste0('gene', 1:4),
+  annotation = paste(c('m', 'k', 'l', 'y'), 'protein'),
+  L4_control_A1 = rnorm(4, 20, 3), C6_control_A1 = rnorm(4, 20, 3),
+  L4_chemical_A1 = rnorm(4, 20, 3), C6_chemical_A1 = rnorm(4, 20, 3))
+ex_tidy <- pivot_longer(ex_wide, L4_control_A1:C6_chemical_A1,
+                        names_to = 'expression', values_to = 'sample',
+                        cols_vary = 'slowest')
+por_indice <- pivot_longer(ex_wide, 3:6, names_to = 'expression',
+                           values_to = 'sample', cols_vary = 'slowest')
+por_exclusion <- pivot_longer(ex_wide, -c(id, annotation),
+                              names_to = 'expression', values_to = 'sample',
+                              cols_vary = 'slowest')
+identical(ex_tidy, por_indice)
+identical(ex_tidy, por_exclusion)
+ex_wide2 <- pivot_wider(ex_tidy, names_from = expression, values_from = sample)
+ex_wide2
+```
+
+Se separó el genotipo y se conservaron las cuatro columnas del ejemplo.
+
+```{r genotipo}
+resultado <- ex_tidy %>%
+  separate(expression, into = c('genotype', 'tratamiento', 'replica'),
+           sep = '_') %>%
+  select(id, annotation, genotype, expression = sample)
+resultado
+```
+
+# Transformaciones con across
+
+Se pasaron los factores a mayúsculas y se sustituyeron los valores menores
+que 3 por `NA` o por `CERO`, según el ejemplo.
+
+```{r across}
+head(iris %>% mutate(across(where(is.factor), toupper)))
+head(iris %>% mutate(across(where(is.numeric), ~ ifelse(.x < 3, NA, .x))))
+head(iris %>% mutate(across(where(is.numeric), ~ ifelse(.x < 3, 'CERO', .x))))
+```
+
+# Tabla de estadísticos
+
+Se calcularon el máximo, mínimo, mediana y media ± desviación típica para
+cada variable del ejemplo.
+
+```{r estadisticos}
+set.seed(1)
+df <- tibble(x = runif(100), y = runif(100), z = runif(100))
+tabla <- data.frame(Variable = names(df),
+  Maximo = sapply(df, max), Minimo = sapply(df, min),
+  Mediana = sapply(df, median),
+  'Media ± SD' = paste0(round(sapply(df, mean), 2), ' ± ',
+                        round(sapply(df, sd), 2)), check.names = FALSE)
+knitr::kable(tabla, digits = 2, row.names = FALSE)
+```

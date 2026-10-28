@@ -1,0 +1,121 @@
+---
+title: "Tema 3. Ejercicios de visualización"
+author: "Carlos Galdámez Huertas (galhuer)"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    toc: true
+    number_sections: true
+lang: es-ES
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(dplyr)
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
+                      error = FALSE, comment = NA, fig.align = 'center',
+                      fig.width = 7, fig.height = 4, fig.path = 'figure/')
+```
+
+# Superposición y ajustes de posición
+
+Hay coches con los mismos valores de consumo: los puntos se superponen.
+`geom_jitter()` los desplaza ligeramente; `geom_count()` cambia su tamaño
+según cuántas observaciones coinciden.
+
+```{r superposicion}
+p <- ggplot(mpg, aes(x = cty, y = hwy))
+p + geom_point()
+nrow(mpg) - nrow(distinct(mpg, cty, hwy))
+p + geom_jitter(width = 0.2, height = 0.2)
+p + geom_count()
+```
+
+La posición predeterminada de `geom_boxplot()` es `dodge2`.
+
+```{r cajas}
+ggplot(mpg, aes(x = class, y = cty, fill = drv)) +
+  geom_boxplot() + labs(x = 'Clase', y = 'Consumo en ciudad', fill = 'Tracción')
+```
+
+# Taller: CPI e índice de desarrollo humano
+
+Se cargaron los datos del taller y se representaron los indicadores.
+
+```{r economist-datos}
+dat <- read.csv('data/EconomistData.csv')
+p <- ggplot(dat, aes(x = CPI, y = HDI))
+p + geom_point()
+p + geom_point(colour = 'blue')
+p + geom_point(aes(colour = Region))
+```
+
+Los boxplots muestran el CPI por región; después se añadieron los puntos.
+
+```{r economist-cajas}
+cajas <- ggplot(dat, aes(x = Region, y = CPI)) +
+  geom_boxplot() + coord_flip()
+cajas
+cajas + geom_point()
+```
+
+# Líneas de ajuste
+
+Se compararon los ajustes lineal y LOESS. Un `span` menor da una curva
+menos suave.
+
+```{r ajustes}
+puntos <- p + geom_point()
+puntos + geom_smooth(method = 'lm')
+puntos + geom_smooth()
+puntos + geom_smooth(method = 'loess', span = 0.4)
+```
+
+# Etiquetas y colores
+
+Se nombraron los ejes y la leyenda y se eligieron colores para las regiones.
+
+```{r escalas}
+colores <- c('EU W. Europe' = '#24576D', 'Americas' = '#099DD7',
+             'Asia Pacific' = '#28AADC', 'East EU Cemt Asia' = '#248E84',
+             'MENA' = '#F2583F', 'SSA' = '#96503F')
+regiones <- ggplot(dat, aes(x = CPI, y = HDI, colour = Region)) + geom_point()
+regiones
+etiquetado <- regiones + labs(x = 'Corruption Perception Index',
+                              y = 'Human Development Index',
+                              colour = 'Región')
+etiquetado
+etiquetado + scale_colour_manual(values = colores)
+```
+
+# Gráfico de The Economist
+
+Se añadieron el ajuste logarítmico, etiquetas de países, fuentes y R².
+
+```{r economist-final, fig.width=6.5, fig.height=5}
+paises <- c('Russia', 'Venezuela', 'Iraq', 'Myanmar', 'Sudan',
+            'Afghanistan', 'Congo', 'Greece', 'Argentina', 'Brazil',
+            'India', 'Italy', 'China', 'South Africa', 'Spain', 'Botswana',
+            'Cape Verde', 'Bhutan', 'Rwanda', 'France', 'United States',
+            'Germany', 'Britain', 'Barbados', 'Norway', 'Japan',
+            'New Zealand', 'Singapore')
+modelo <- lm(HDI ~ log(CPI), data = dat)
+ggplot(dat, aes(x = CPI, y = HDI, colour = Region)) +
+  geom_smooth(aes(group = 1), method = 'lm', formula = y ~ log(x),
+              se = FALSE, colour = 'red') +
+  geom_point(shape = 1) +
+  ggrepel::geom_text_repel(data = subset(dat, Country %in% paises),
+                           aes(label = Country), colour = 'grey20',
+                           size = 2.5, seed = 1, max.overlaps = Inf,
+                           show.legend = FALSE) +
+  scale_colour_manual(values = colores) +
+  scale_x_continuous(limits = c(0.9, 10.5), breaks = 1:10) +
+  scale_y_continuous(limits = c(0.2, 1), breaks = seq(0.2, 1, 0.1)) +
+  labs(title = 'Corruption and Human development',
+       x = 'Corruption Perceptions Index, 2011',
+       y = 'Human Development Index, 2011', colour = NULL,
+       caption = paste0('Sources: Transparency International; UN HDR. R2 = ',
+                        round(summary(modelo)$r.squared, 2))) +
+  guides(colour = guide_legend(nrow = 2)) +
+  theme_minimal() + theme(legend.position = 'top', panel.grid.major.x = element_blank())
+```

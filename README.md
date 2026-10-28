@@ -3,6 +3,9 @@
 - `Tema0`: configuración de Git y ejercicio de control de versiones.
 - `Tema1`: plantilla y conjuntos de datos en R.
 - `Tema2`: ejercicios y ejemplos de obtención de datos.
+- `Tema3`: ejercicios de visualización de datos y taller de gráficos.
+- `Tema4`: ejercicios de texto y expresiones regulares.
+- `Tema5`: ejercicios de manejo y transformación de datos.
 - `P1/ImportaFicheros`: importación, apartados 1 a 8.
 - `P2`: visualización de datos, ejercicios 1 a 8.
 
@@ -18,3 +21,7 @@ Desde la raíz del repositorio:
 ```r
 rmarkdown::render('P2/ProyectoR.Rmd', output_format = 'pdf_document')
 ```
+
+Para ejecutar los ejercicios de los temas 3, 4 y 5 se necesitan los paquetes
+`rmarkdown`, `knitr`, `ggplot2`, `dplyr`, `tidyr`, `stringr`, `MASS`,
+`ggrepel`, `maps`, `lutz`, `sf` y `gapminder`.
