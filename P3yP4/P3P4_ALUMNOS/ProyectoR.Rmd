@@ -283,3 +283,40 @@ retrasos %>% arrange(desc(llegada))
 
 En las salidas los mayores retrasos medios son de BOMBARDIER INC y BOEING.
 En las llegadas son de BOMBARDIER INC y AIRBUS COMP.
+
+\newpage
+
+# Ejercicio extra 5
+
+Se representaron los retrasos de salida y llegada por compañía. En los
+boxplots se muestra la zona entre -60 y 120 minutos para ver las cajas.
+
+```{r extra5-boxplot, echo = TRUE, fig.path = 'Results/', fig.width = 7, fig.height = 4, dev = 'cairo_pdf'}
+dir.create('Results', showWarnings = FALSE)
+retrasos_largos <- flights %>%
+  pivot_longer(ends_with('delay'), names_to = 'tipo',
+               values_to = 'retraso', values_drop_na = TRUE)
+
+ggplot(retrasos_largos, aes(carrier, retraso, fill = tipo)) +
+  geom_boxplot(outlier.alpha = 0.1) +
+  coord_cartesian(ylim = c(-60, 120)) +
+  labs(x = 'Compañía aérea', y = 'Retraso (minutos)', fill = 'Retraso')
+```
+
+\newpage
+
+```{r extra5-barras, echo = TRUE, fig.path = 'Results/', fig.width = 7, fig.height = 4, dev = 'cairo_pdf'}
+medias <- flights %>%
+  group_by(carrier) %>%
+  summarise(salida = mean(dep_delay, na.rm = TRUE),
+            llegada = mean(arr_delay, na.rm = TRUE)) %>%
+  mutate(global = (salida + llegada) / 2) %>%
+  pivot_longer(-carrier, names_to = 'tipo', values_to = 'retraso')
+
+ggplot(medias, aes(carrier, retraso, fill = tipo)) +
+  geom_col(position = 'dodge') +
+  labs(x = 'Compañía aérea', y = 'Retraso medio (minutos)', fill = 'Retraso')
+```
+
+Para comparar los retrasos medios, el gráfico de barras es más adecuado;
+los boxplots muestran la distribución de los retrasos.
