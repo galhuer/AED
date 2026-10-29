@@ -81,6 +81,8 @@ pacman::p_load(char=packages)
 
 ```
 
+\newpage
+
 # Ejercicio 1
 
 Se agruparon los intervalos de ingresos en una columna de tipo factor y los casos en otra.
@@ -189,4 +191,14 @@ Se eliminaron las variables indicadas de ambos conjuntos.
 ```{r ejercicio9, echo = TRUE}
 flights <- flights %>% select(-time_hour, -ends_with('time'))
 planes <- planes %>% select(-speed, -type)
+```
+
+# Ejercicio 10
+
+Se creó la fecha como texto y se eliminaron las columnas originales.
+
+```{r ejercicio10, echo = TRUE}
+flights <- flights %>%
+  mutate(Full_Date = format(make_date(year, month, day), '%d-%m-%Y')) %>%
+  select(-year, -month, -day)
 ```
