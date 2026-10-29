@@ -320,3 +320,70 @@ ggplot(medias, aes(carrier, retraso, fill = tipo)) +
 
 Para comparar los retrasos medios, el gráfico de barras es más adecuado;
 los boxplots muestran la distribución de los retrasos.
+
+\newpage
+
+# Ejercicio extra 6
+
+Se usaron los vuelos filtrados y los datos de los aviones.
+
+1. Aviones con más vuelos de JFK a SFO:
+
+```{r extra6-1, echo = TRUE}
+aviones_sfo <- flights %>%
+  filter(origin == 'JFK', dest == 'SFO') %>%
+  group_by(tailnum) %>%
+  summarise(vuelos = n(), carrier = first(carrier)) %>%
+  filter(vuelos == max(vuelos)) %>%
+  left_join(planes, by = 'tailnum') %>%
+  select(tailnum, vuelos, carrier, year, model, seats)
+aviones_sfo
+```
+
+Los aviones N505UA y N557UA empatan con 171 vuelos cada uno.
+
+2. Compañías y aviones en la ruta JFK–LAX:
+
+```{r extra6-2, echo = TRUE}
+jfk_lax <- flights %>% filter(origin == 'JFK', dest == 'LAX')
+jfk_lax %>% summarise(companias = n_distinct(carrier),
+                      aviones = n_distinct(tailnum))
+```
+
+Para el histograma se recuperó el tiempo en el aire de `flights.f`,
+que contiene los mismos vuelos filtrados antes de eliminar columnas.
+
+\newpage
+
+```{r extra6-histograma, echo = TRUE, fig.path = 'Results/', fig.width = 7, fig.height = 4, dev = 'cairo_pdf'}
+flights.f %>%
+  filter(origin == 'JFK', dest == 'LAX') %>%
+  ggplot(aes(air_time / 60)) +
+  geom_histogram(binwidth = 0.25) +
+  labs(x = 'Tiempo en el aire (horas)', y = 'Número de vuelos')
+```
+
+Los datos indican el origen y el destino, pero no permiten comprobar si
+hubo escalas.
+
+\newpage
+
+3. Compañía con menor tiempo entre la salida prevista y la llegada real
+para la ruta LGA–DEN. Se sumaron dos horas a la hora de llegada por la
+diferencia horaria entre Nueva York y Denver.
+
+```{r extra6-3, echo = TRUE}
+tiempo_denver <- flights.f %>%
+  filter(origin == 'LGA', dest == 'DEN') %>%
+  mutate(duracion = ((arr_time %/% 100 * 60 + arr_time %% 100 + 120) -
+                       (dep_time %/% 100 * 60 + dep_time %% 100)) %% 1440,
+         total = duracion + dep_delay) %>%
+  group_by(carrier) %>%
+  summarise(duracion_horas = mean(duracion, na.rm = TRUE) / 60,
+            total_horas = mean(total, na.rm = TRUE) / 60) %>%
+  arrange(total_horas)
+tiempo_denver
+```
+
+UA tiene el menor tiempo medio desde la salida prevista hasta la llegada:
+aproximadamente 4,5 horas. La duración real media del vuelo es 4,32 horas.
