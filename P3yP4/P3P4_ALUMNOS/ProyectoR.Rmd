@@ -215,3 +215,24 @@ Distances_plane <- flights %>%
             Total_distance = sum(distance))
 head(Distances_plane)
 ```
+
+\newpage
+
+# Ejercicio extra 1
+
+Se separaron las canciones y sus posiciones usando un identificador.
+
+```{r extra1, echo = TRUE}
+canciones <- billboard_tidy %>%
+  select(artist, track, time) %>%
+  unique() %>%
+  mutate(id = row_number())
+
+ranking <- billboard_tidy %>%
+  left_join(canciones, by = c('artist', 'track', 'time')) %>%
+  select(id, week, rank) %>%
+  unique()
+
+head(canciones)
+head(ranking)
+```
