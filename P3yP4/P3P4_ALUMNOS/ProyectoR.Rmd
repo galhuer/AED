@@ -90,3 +90,16 @@ load('data/pew_religion.Rdata')
 pew_tidy <- gather(pew_religion, income, freq, -religion, factor_key = TRUE)
 head(pew_tidy)
 ```
+
+\newpage
+
+# Ejercicio 2
+
+Se agruparon las semanas y las posiciones en dos columnas.
+
+```{r ejercicio2, echo = TRUE}
+load('data/billboard.Rdata')
+billboard_tidy <- pivot_longer(raw, wk1:wk76, names_to = 'week',
+                               values_to = 'rank', names_prefix = 'wk')
+head(billboard_tidy[, c('artist', 'week', 'rank')])
+```
