@@ -262,3 +262,24 @@ Distance_Manufacturer_model <- Distances_plane %>%
   select(tailnum, Total_distance, manufacturer, model)
 head(Distance_Manufacturer_model)
 ```
+
+\newpage
+
+# Ejercicio extra 4
+
+Se unieron los vuelos con los aviones y se calcularon los retrasos medios
+por fabricante, usando los valores disponibles para cada retraso.
+
+```{r extra4, echo = TRUE}
+retrasos <- flights %>%
+  left_join(planes, by = 'tailnum') %>%
+  group_by(manufacturer) %>%
+  summarise(salida = mean(dep_delay, na.rm = TRUE),
+            llegada = mean(arr_delay, na.rm = TRUE))
+
+retrasos %>% arrange(desc(salida))
+retrasos %>% arrange(desc(llegada))
+```
+
+En las salidas los mayores retrasos medios son de BOMBARDIER INC y BOEING.
+En las llegadas son de BOMBARDIER INC y AIRBUS COMP.
