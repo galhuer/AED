@@ -74,8 +74,10 @@
 
 !/P3yP4/
 /P3yP4/*
-!/P3yP4/ProyectoR.Rmd
-!/P3yP4/ProyectoR.pdf
-!/P3yP4/data/
-/P3yP4/data/*
-!/P3yP4/data/pew_religion.Rdata
+!/P3yP4/P3P4_ALUMNOS/
+/P3yP4/P3P4_ALUMNOS/*
+!/P3yP4/P3P4_ALUMNOS/ProyectoR.Rmd
+!/P3yP4/P3P4_ALUMNOS/ProyectoR.pdf
+!/P3yP4/P3P4_ALUMNOS/data/
+/P3yP4/P3P4_ALUMNOS/data/*
+!/P3yP4/P3P4_ALUMNOS/data/pew_religion.Rdata
