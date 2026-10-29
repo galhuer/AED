@@ -71,3 +71,11 @@
 !/Tema5/data/iceRiver.RData
 !/Tema5/data/children_per_woman_total_fertility.csv
 !/.gitattributes
+
+!/P3yP4/
+/P3yP4/*
+!/P3yP4/ProyectoR.Rmd
+!/P3yP4/ProyectoR.pdf
+!/P3yP4/data/
+/P3yP4/data/*
+!/P3yP4/data/pew_religion.Rdata
