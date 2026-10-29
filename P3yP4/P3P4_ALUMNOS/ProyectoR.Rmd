@@ -170,3 +170,14 @@ Se seleccionaron los vuelos de los aviones filtrados.
 flights.f <- semi_join(flights, planes.f, by = 'tailnum')
 head(flights.f[, c('tailnum', 'origin', 'dest')])
 ```
+
+\newpage
+
+# Ejercicio 8
+
+Se asignaron los datos filtrados a los nombres originales.
+
+```{r ejercicio8, echo = TRUE}
+planes <- planes.f
+flights <- flights.f
+```
