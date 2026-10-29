@@ -181,3 +181,12 @@ Se asignaron los datos filtrados a los nombres originales.
 planes <- planes.f
 flights <- flights.f
 ```
+
+# Ejercicio 9
+
+Se eliminaron las variables indicadas de ambos conjuntos.
+
+```{r ejercicio9, echo = TRUE}
+flights <- flights %>% select(-time_hour, -ends_with('time'))
+planes <- planes %>% select(-speed, -type)
+```
