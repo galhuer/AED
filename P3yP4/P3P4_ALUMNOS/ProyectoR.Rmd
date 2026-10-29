@@ -132,3 +132,17 @@ weather_tidy <- raw %>%
   pivot_wider(names_from = element, values_from = temperatura)
 head(weather_tidy)
 ```
+
+\newpage
+
+# Ejercicio 5
+
+```{r ejercicio5, echo = TRUE, R.options = list(width = 80)}
+load('data/VuelosNY.Rdata')
+head(flights)
+head(planes)
+```
+
+`flights` contiene información de cada vuelo, como las fechas, los horarios,
+los retrasos y los aeropuertos. `planes` describe cada avión, incluyendo su
+fabricante, modelo y número de asientos.
