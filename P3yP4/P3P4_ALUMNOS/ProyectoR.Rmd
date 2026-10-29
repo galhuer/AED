@@ -161,3 +161,12 @@ planes.f <- planes %>%
                                 'AIRBUS COMP', manufacturer))
 head(planes.f)
 ```
+
+# Ejercicio 7
+
+Se seleccionaron los vuelos de los aviones filtrados.
+
+```{r ejercicio7, echo = TRUE}
+flights.f <- semi_join(flights, planes.f, by = 'tailnum')
+head(flights.f[, c('tailnum', 'origin', 'dest')])
+```
