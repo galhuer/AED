@@ -202,3 +202,16 @@ flights <- flights %>%
   mutate(Full_Date = format(make_date(year, month, day), '%d-%m-%Y')) %>%
   select(-year, -month, -day)
 ```
+
+# Ejercicio 11
+
+Se calcularon el número de vuelos y las distancias de cada avión.
+
+```{r ejercicio11, echo = TRUE}
+Distances_plane <- flights %>%
+  filter(!is.na(tailnum)) %>%
+  group_by(tailnum) %>%
+  summarise(Num_flights = n(), Mean_distance = mean(distance),
+            Total_distance = sum(distance))
+head(Distances_plane)
+```
