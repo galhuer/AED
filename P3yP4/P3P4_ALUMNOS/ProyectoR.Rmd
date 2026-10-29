@@ -146,3 +146,18 @@ head(planes)
 `flights` contiene información de cada vuelo, como las fechas, los horarios,
 los retrasos y los aeropuertos. `planes` describe cada avión, incluyendo su
 fabricante, modelo y número de asientos.
+
+\newpage
+
+# Ejercicio 6
+
+Se filtraron los aviones y se unificaron los nombres de Airbus.
+
+```{r ejercicio6, echo = TRUE, R.options = list(width = 80)}
+planes.f <- planes %>%
+  filter(!grepl('MCDONNELL DOUGLAS', manufacturer)) %>%
+  filter(seats >= 90, seats <= 210) %>%
+  mutate(manufacturer = if_else(grepl('AIRBUS', manufacturer),
+                                'AIRBUS COMP', manufacturer))
+head(planes.f)
+```
