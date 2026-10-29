@@ -103,3 +103,15 @@ billboard_tidy <- pivot_longer(raw, wk1:wk76, names_to = 'week',
                                values_to = 'rank', names_prefix = 'wk')
 head(billboard_tidy[, c('artist', 'week', 'rank')])
 ```
+
+# Ejercicio 3
+
+Se agruparon los casos y se separaron el sexo y la edad.
+
+```{r ejercicio3, echo = TRUE}
+load('data/tb.Rdata')
+tb_tidy <- raw %>%
+  gather(grupo, casos, -country, -year) %>%
+  separate(grupo, into = c('sexo', 'edad'), sep = 1)
+head(tb_tidy)
+```
