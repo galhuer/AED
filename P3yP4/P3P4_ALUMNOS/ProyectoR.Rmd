@@ -115,3 +115,20 @@ tb_tidy <- raw %>%
   separate(grupo, into = c('sexo', 'edad'), sep = 1)
 head(tb_tidy)
 ```
+
+\newpage
+
+# Ejercicio 4
+
+Se agruparon los días, se creó la fecha y se separaron las temperaturas.
+
+```{r ejercicio4, echo = TRUE}
+load('data/weather.Rdata')
+weather_tidy <- raw %>%
+  pivot_longer(d1:d31, names_to = 'dia', names_prefix = 'd',
+               values_to = 'temperatura', values_drop_na = TRUE) %>%
+  mutate(fecha = make_date(year, month, as.integer(dia))) %>%
+  select(-year, -month, -dia) %>%
+  pivot_wider(names_from = element, values_from = temperatura)
+head(weather_tidy)
+```
