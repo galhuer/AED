@@ -236,3 +236,17 @@ ranking <- billboard_tidy %>%
 head(canciones)
 head(ranking)
 ```
+
+\newpage
+
+# Ejercicio extra 2
+
+Se unió el año, se separaron los casos y la población y se cambiaron sus tipos.
+
+```{r extra2, echo = TRUE}
+tabla <- table5 %>%
+  unite(year, century, year, sep = '') %>%
+  separate(rate, into = c('cases', 'population'), sep = '/') %>%
+  mutate(across(c(year, cases, population), as.numeric))
+tabla
+```
