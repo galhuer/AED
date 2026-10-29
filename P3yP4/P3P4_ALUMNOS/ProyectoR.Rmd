@@ -250,3 +250,15 @@ tabla <- table5 %>%
   mutate(across(c(year, cases, population), as.numeric))
 tabla
 ```
+
+# Ejercicio extra 3
+
+Se unieron los datos de los aviones y se ordenaron por distancia total.
+
+```{r extra3, echo = TRUE}
+Distance_Manufacturer_model <- Distances_plane %>%
+  left_join(planes, by = 'tailnum') %>%
+  arrange(desc(Total_distance)) %>%
+  select(tailnum, Total_distance, manufacturer, model)
+head(Distance_Manufacturer_model)
+```
