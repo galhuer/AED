@@ -100,3 +100,6 @@
 !/P5/P5_ALUMNOS/data/
 /P5/P5_ALUMNOS/data/*
 !/P5/P5_ALUMNOS/data/dirty_iris.csv
+!/P5/P5_ALUMNOS/Results/
+/P5/P5_ALUMNOS/Results/*
+!/P5/P5_ALUMNOS/Results/ejercicio8-1.pdf

@@ -223,3 +223,24 @@ print(valores, n = Inf)
 
 El método de percentiles detecta más valores atípicos; Hampel y boxplot
 identifican los mismos.
+
+\newpage
+
+# Ejercicio 8
+
+Se representaron las medidas de `Petal.Length` y los valores atípicos de
+cada método en distinto color.
+
+```{r ejercicio8, echo = TRUE, fig.path = 'Results/', fig.width = 7, fig.height = 4, dev = 'cairo_pdf'}
+dir.create('Results', showWarnings = FALSE)
+datos_grafico <- dirty_iris %>%
+  select(Petal.Length, sigma, hampel, boxplot, percentil) %>%
+  pivot_longer(-Petal.Length, names_to = 'metodo', values_to = 'atipico') %>%
+  filter(!is.na(Petal.Length)) %>%
+  arrange(atipico)
+
+set.seed(123)
+ggplot(datos_grafico, aes(metodo, Petal.Length, color = atipico)) +
+  geom_point(position = 'jitter') +
+  labs(x = 'Método', y = 'Petal.Length', color = 'Atípico')
+```
