@@ -114,3 +114,13 @@ dirty_iris <- dirty_iris %>%
                 ~ ifelse(!is.finite(.x) | .x <= 0, NA, .x)))
 colSums(is.na(dirty_iris))
 ```
+
+# Ejercicio 3
+
+Se calcularon las observaciones completas y se guardaron en `clean_iris`.
+
+```{r ejercicio3, echo = TRUE}
+completas <- complete.cases(dirty_iris)
+data.frame(numero = sum(completas), porcentaje = mean(completas) * 100)
+clean_iris <- na.omit(dirty_iris)
+```
