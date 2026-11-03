@@ -102,3 +102,15 @@ data.frame(
 
 Hay valores ausentes, medidas iguales a cero, una medida negativa (-3) y un
 valor infinito. También destacan valores altos como 73, 30 y 63.
+
+# Ejercicio 2
+
+Se sustituyeron por `NA` los valores especiales y las medidas menores o
+iguales a cero.
+
+```{r ejercicio2, echo = TRUE}
+dirty_iris <- dirty_iris %>%
+  mutate(across(where(is.numeric),
+                ~ ifelse(!is.finite(.x) | .x <= 0, NA, .x)))
+colSums(is.na(dirty_iris))
+```
