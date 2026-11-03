@@ -199,3 +199,27 @@ dirty_iris <- dirty_iris %>%
                 .names = '{.fn}'))
 head(dirty_iris %>% select(Petal.Length, sigma, hampel, boxplot, percentil))
 ```
+
+\newpage
+
+# Ejercicio 7
+
+Se contaron los valores atípicos y se ordenaron por método.
+
+```{r ejercicio7, echo = TRUE}
+conteos <- dirty_iris %>%
+  summarise(across(c(sigma, hampel, boxplot, percentil),
+                   ~ sum(.x, na.rm = TRUE)))
+conteos
+
+valores <- dirty_iris %>%
+  select(Petal.Length, sigma, hampel, boxplot, percentil) %>%
+  pivot_longer(-Petal.Length, names_to = 'metodo', values_to = 'atipico') %>%
+  filter(atipico) %>%
+  arrange(metodo, Petal.Length) %>%
+  select(metodo, Petal.Length)
+print(valores, n = Inf)
+```
+
+El método de percentiles detecta más valores atípicos; Hampel y boxplot
+identifican los mismos.
