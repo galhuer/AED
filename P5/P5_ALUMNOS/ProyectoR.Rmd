@@ -129,8 +129,6 @@ data.frame(numero = sum(completas), porcentaje = mean(completas) * 100)
 clean_iris <- na.omit(dirty_iris)
 ```
 
-\newpage
-
 # Ejercicio 4
 
 Se calcularon los estadísticos para los dos conjuntos, sin contar los valores
