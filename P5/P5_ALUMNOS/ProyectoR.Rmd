@@ -155,3 +155,30 @@ resumen
 Para `Petal.Length`, la media es 4,48 en `dirty_iris` y 4,16 en `clean_iris`.
 La desviación típica baja de 5,78 a 2,88; la mediana y la MADM coinciden y
 el IQR pasa de 3,5 a 3,6.
+
+\newpage
+
+# Ejercicio 5
+
+Se definieron las cuatro reglas para identificar valores atípicos.
+
+```{r ejercicio5, echo = TRUE}
+reglasigma <- function(x) {
+  abs(x - mean(x, na.rm = TRUE)) > 3 * sd(x, na.rm = TRUE)
+}
+
+reglahampel <- function(x) {
+  abs(x - median(x, na.rm = TRUE)) > 3 * madm(x)
+}
+
+reglaboxplot <- function(x) {
+  cuartiles <- quantile(x, c(0.25, 0.75), na.rm = TRUE)
+  rango <- diff(cuartiles)
+  x < cuartiles[1] - 1.5 * rango | x > cuartiles[2] + 1.5 * rango
+}
+
+reglapercentil <- function(x) {
+  limites <- quantile(x, c(0.05, 0.95), na.rm = TRUE)
+  x < limites[1] | x > limites[2]
+}
+```
