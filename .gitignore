@@ -90,3 +90,13 @@
 !/P3yP4/P3P4_ALUMNOS/Results/extra5-boxplot-1.pdf
 !/P3yP4/P3P4_ALUMNOS/Results/extra5-barras-1.pdf
 !/P3yP4/P3P4_ALUMNOS/Results/extra6-histograma-1.pdf
+
+!/P5/
+/P5/*
+!/P5/P5_ALUMNOS/
+/P5/P5_ALUMNOS/*
+!/P5/P5_ALUMNOS/ProyectoR.Rmd
+!/P5/P5_ALUMNOS/ProyectoR.pdf
+!/P5/P5_ALUMNOS/data/
+/P5/P5_ALUMNOS/data/*
+!/P5/P5_ALUMNOS/data/dirty_iris.csv

@@ -1,0 +1,104 @@
+---
+title: "Práctica 5. Datos Anómalos"
+author: "Carlos Galdámez Huertas (galhuer)"
+date: "`r Sys.Date()`"
+output:
+  bookdown::pdf_document2:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+    figure_caption: "Figura" # Referencias en castellano
+    table_caption: "Tabla"
+  html_document:
+    echo: true
+    number_sections: true
+    theme: lumen
+    toc: true
+  html_notebook:
+    echo: true
+    number_sections: true
+    toc: true
+  pdf_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+  bookdown::html_document2:
+    echo: true
+    number_sections: true
+    theme: spacelab
+    toc: true
+    figure_caption: "Figura"
+    table_caption: "Tabla"
+always_allow_html: true
+params:
+  lang: ES
+lang: "`r switch(params$lang, ES = 'es-ES', EN = 'en-US')`"
+subtitle: "Análisis Exploratorio de Datos. Máster en Ciencia de Datos - UV"
+language:
+  label:
+    fig: 'Figura '
+    tab: 'Tabla '
+    eq: 'Ecuación '
+    thm: 'Teorema '
+    lem: 'Lema '
+    def: 'Definición '
+    cor: 'Corolario '
+    prp: 'Proposición '
+    exm: 'Ejemplo '
+    exr: 'Ejercicio '
+    proof: 'Demostración. '
+    remark: 'Nota: '
+    solution: 'Solución. '
+---
+
+```{r setup, cache = F, echo = F, message = F, warning = F, tidy = F}
+
+
+# CONFIGURACIÓN GENERAL
+library(knitr)
+options(width = 100)
+
+# Opciones generales de los chucks. Se utilizarán salvo cambios en el chunk
+opts_chunk$set(echo=F, message = F, error = F, warning = F, comment = NA, fig.align = 'center', dpi = 200, tidy = F, cache.path = '.cache/', fig.path = './figura/')
+
+# Opciones generales de dígitos cuando se incluyen tablas
+#options(xtable.type = 'html')
+knit_hooks$set(inline = function(x) {
+  
+  if(is.numeric(x)) {
+    round(x, getOption('digits'))
+  } else {
+    paste(as.character(x), collapse = ', ')
+  }
+})
+#knit_hooks$set(plot = knitr:::hook_plot_html)
+```
+
+```{r}
+library(pacman)
+packages = c("knitr", "ggplot2","tidyr","dplyr","readr")
+pacman::p_load(char=packages)
+
+```
+
+# Ejercicio 1
+
+Se inspeccionaron los datos y se ordenó cada variable de menor a mayor y de
+mayor a menor. Se muestran los tres primeros valores de cada orden.
+
+```{r ejercicio1, echo = TRUE}
+dirty_iris <- read_csv('data/dirty_iris.csv')
+if (interactive()) View(dirty_iris)
+
+menor <- lapply(dirty_iris, sort, na.last = TRUE)
+mayor <- lapply(dirty_iris, sort, decreasing = TRUE, na.last = TRUE)
+data.frame(
+  variable = names(dirty_iris),
+  menor = sapply(menor, function(x) paste(head(x, 3), collapse = ', ')),
+  mayor = sapply(mayor, function(x) paste(head(x, 3), collapse = ', ')),
+  faltantes = colSums(is.na(dirty_iris)), row.names = NULL
+)
+```
+
+Hay valores ausentes, medidas iguales a cero, una medida negativa (-3) y un
+valor infinito. También destacan valores altos como 73, 30 y 63.
