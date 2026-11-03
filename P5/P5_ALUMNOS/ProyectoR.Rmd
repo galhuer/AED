@@ -265,3 +265,28 @@ head(dirty_iris %>%
        filter(is.na(Petal.Length)) %>%
        select(Species, Petal.Length, Petal.Length1, Petal.Length2))
 ```
+
+\newpage
+
+# Ejercicio 10
+
+Se aplicaron las reglas a `Petal.Length2` y se compararon las imputaciones,
+excluyendo los valores atípicos según la regla del percentil.
+
+```{r ejercicio10a, echo = TRUE}
+dirty_iris <- dirty_iris %>%
+  mutate(across(Petal.Length2,
+                list(sigma = reglasigma, hampel = reglahampel,
+                     boxplot = reglaboxplot, percentil = reglapercentil),
+                .names = '{.fn}2'))
+
+head(dirty_iris %>% select(Petal.Length2, sigma2, hampel2, boxplot2, percentil2))
+```
+
+```{r ejercicio10b, echo = TRUE, fig.path = 'Results/', fig.width = 7, fig.height = 4, dev = 'cairo_pdf'}
+dirty_iris %>%
+  filter(!percentil2) %>%
+  ggplot(aes(Petal.Length1, Petal.Length2, color = is.na(Petal.Length))) +
+  geom_point() +
+  labs(color = 'Imputado')
+```
